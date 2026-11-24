@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STREET FIGHTER 6 辞書</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --card-done-bg: #15291b;
+            --accent-color: #ff9800;
+            --done-color: #4caf50;
+            --info-color: #2196f3;
+            --danger-color: #f44336;
+            --text-color: #f0f0f0;
+            --text-sub: #b0b0b0;
+            --border-color: #333;
+            --border-done: #2e7d32;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            padding-bottom: 100px;
+            font-size: 17px;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            color: var(--accent-color);
+            margin: 0 0 16px 0;
+            text-align: center;
+            transition: color 0.3s;
+        }
+
+        /* --- 全体共通マネージャー（課題と目標） --- */
+        .global-manager-container {
+            background: #121d28;
+            border: 1px solid #1e3a50;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .global-manager-title {
+            font-size: 1.15rem;
+            color: #4fc3f7;
+            font-weight: bold;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .goal-box {
+            background: #18222c;
+            border: 1px solid #ffb74d;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+
+        .goal-box-title {
+            font-size: 0.95rem;
+            color: #ffb74d;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .goal-textarea {
+            width: 100%;
+            height: 60px;
+            background: #111820;
+            border: 1px solid #334455;
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            resize: vertical;
+        }
+
+        .task-category-card {
+            background: #152230;
+            border: 1px solid #23384c;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .task-category-header {
+            padding: 12px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: bold;
+            color: #e1f5fe;
+            user-select: none;
+            border-left: 4px solid #2196f3;
+        }
+
+        .task-category-header::after {
+            content: "▶";
+            font-size: 0.85rem;
+            color: #81d4fa;
+            transition: transform 0.2s;
+        }
+
+        .task-category-card.open .task-category-header::after {
+            transform: rotate(90deg);
+        }
+
+        .task-category-body {
+            display: none;
+            padding: 12px 14px;
+            border-top: 1px solid #1e3245;
+            background: #101923;
+        }
+
+        .task-category-card.open .task-category-body {
+            display: block;
+        }
+
+        .task-item {
+            background: #162230;
+            border: 1px solid #24384c;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+        .task-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .task-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .task-item-title {
+            font-weight: bold;
+            color: #ffb74d;
+            font-size: 1rem;
+        }
+
+        .task-item-content {
+            white-space: pre-wrap;
+            line-height: 1.5;
+            color: #d1e8ff;
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .task-checks-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #101820;
+            padding: 8px 12px;
+            border-radius: 18px;
+            border: 1px solid #2c3e50;
+        }
+
+        .task-checks-label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .task-step-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .task-step-checkbox:checked {
+            background: var(--done-color);
+            border-color: var(--done-color);
+        }
+
+        .task-delete-btn {
+            background: #2a1a1a;
+            border: 1px solid #552222;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .task-add-form {
+            background: #141f2b;
+            border: 1px dashed #2c445e;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 14px;
+        }
+
+        .task-add-form h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            color: #81d4fa;
+        }
+
+        .task-add-form input, .task-add-form textarea {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 8px;
+            background: #0d151e;
+            border: 1px solid #283d54;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+        }
+
+        .task-add-btn {
+            width: 100%;
+            padding: 8px;
+            background: #0288d1;
+            color: #fff;
+            border: none;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        /* --- メインコンテンツ --- */
+        .controls-wrapper {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .char-selector-container {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .char-select {
+            width: 100%;
+            padding: 12px 10px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            background: #252525;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box;
+            cursor: pointer;
+        }
+
+        .char-action-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .char-select-btn {
+            flex: 1 1 auto;
+            min-width: 64px;
+            background: #2a2a2a;
+            color: var(--text-sub);
+            border: 1px solid var(--border-color);
+            padding: 10px 10px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .char-select-btn:hover {
+            border-color: var(--accent-color);
+            color: #fff;
+        }
+
+        .char-select-btn.danger {
+            background: #2a1818;
+            border-color: #5a2828;
+            color: #ff8a80;
+        }
+
+        .char-select-btn.danger:hover {
+            border-color: var(--danger-color);
+            color: #ff5252;
+        }
+
+        .section-switch-container {
+            display: flex;
+            background: #222;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 12px;
+            gap: 4px;
+            overflow-x: auto;
+        }
+
+        .section-switch-btn {
+            flex: 1;
+            background: transparent;
+            color: var(--text-sub);
+            border: none;
+            padding: 10px 8px;
+            font-size: 0.95rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .section-switch-btn.active {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        .filter-container {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .filter-title {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 2px;
+            align-items: center;
+        }
+
+        .filter-btn {
+            background: #2a2a2a;
+            color: #ccc;
+            border: 1px solid #444;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: #333;
+            color: var(--accent-color);
+            border-color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .filter-btn.toggle-btn.active {
+            background: #2d3e50;
+            border-color: var(--info-color);
+            color: #fff;
+        }
+
+        .filter-btn.reset-all-btn {
+            margin-left: auto;
+            background: #3a2222;
+            border-color: #663333;
+            color: #ff9999;
+        }
+
+        .search-box-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            padding-right: 60px;
+            font-size: 17px;
+            background: #252525;
+            border: 1px solid var(--border-color);
+            color: #fff;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        .search-shortcut-badge {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #333;
+            border: 1px solid #555;
+            color: var(--text-sub);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            pointer-events: none;
+            font-family: monospace;
+        }
+
+        .overall-progress-banner {
+            background: #1a261a;
+            border: 1px solid #2e7d32;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .overall-progress-title {
+            font-size: 0.95rem;
+            color: #81c784;
+        }
+
+        .overall-progress-stats {
+            font-size: 1.1rem;
+            color: #a5d6a7;
+        }
+
+        .category-group {
+            background: #181818;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .category-header {
+            background: var(--cat-header-bg, #2d1a00);
+            color: var(--accent-color);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 0;
+            border-left: 5px solid var(--accent-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .category-title-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            flex-grow: 1;
+        }
+
+        .category-title-area::after {
+            content: "▶";
+            font-size: 0.85rem;
+            color: var(--text-sub);
+        }
+
+        .category-group.collapsed .category-title-area::after {
+            content: "▶";
+        }
+
+        .category-group:not(.collapsed) .category-title-area::after {
+            content: "▼";
+        }
+
+        .category-group.collapsed .category-content {
+            display: none;
+        }
+
+        .category-group:not(.collapsed) .category-header {
+            margin-bottom: 12px;
+        }
+
+        .category-actions {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+
+        .cat-action-btn {
+            background: var(--cat-sub-bg, #402400);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            font-size: 0.8rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .cat-action-btn.reset-btn {
+            border-color: #ff9800;
+            color: #ffcc80;
+        }
+
+        .category-count {
+            font-size: 0.9rem;
+            background: var(--cat-sub-bg, #402400);
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: var(--accent-color);
+        }
+
+        .category-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        @media (min-width: 850px) {
+            .category-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card, .card-info {
+            position: relative;
+            border-radius: 8px;
+            padding: 14px;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .card.done {
+            background: var(--card-done-bg);
+            border-color: var(--border-done);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .card-actions-top {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .action-icon-btn {
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: var(--text-sub);
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 3px 7px;
+            border-radius: 4px;
+        }
+
+        .action-icon-btn.delete {
+            color: #ff5252;
+            border-color: #552222;
+        }
+
+        .action-icon-btn.reset-card {
+            color: #ffb74d;
+            border-color: #664411;
+        }
+
+        .combo-num {
+            font-size: 0.9rem;
+            font-weight: bold;
+            background: #333;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 4px;
+        }
+
+        .card.done .combo-num {
+            background: #2e7d32;
+        }
+
+        .checks-container {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            background: #252525;
+            padding: 7px 11px;
+            border-radius: 18px;
+            border: 1px solid #444;
+        }
+
+        .checks-label-text {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .step-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #333;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .step-checkbox:checked {
+            background: var(--done-color);
+            border-color: var(--done-color);
+        }
+
+        .recipe {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #ffffff;
+            font-weight: bold;
+            word-break: break-all;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+
+        .card.done .recipe {
+            color: #b8dbb9;
+            text-decoration: none;
+        }
+
+        .combo-okizeme {
+            font-size: 0.95rem;
+            color: #b0c4de;
+            background: #18222a;
+            border-left: 3px solid var(--info-color);
+            padding: 8px 10px;
+            border-radius: 4px;
+            margin-top: 8px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        .card.done .combo-okizeme {
+            color: #9ab5c9;
+        }
+
+        .arrow {
+            color: var(--accent-color);
+            margin: 0 3px;
+        }
+
+        .card-info {
+            background: #18222a;
+            border: 1px solid #1e3a50;
+        }
+
+        .card-info.matchup-card {
+            background: #231824;
+            border-color: #4a234e;
+        }
+        .card-info.matchup-card .info-title {
+            color: #ce93d8;
+        }
+        .card-info.matchup-card .info-body {
+            border-top-color: #4a234e;
+        }
+
+        .info-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .info-title {
+            font-weight: bold;
+            color: var(--info-color);
+            font-size: 1.05rem;
+            cursor: pointer;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        .info-title::after {
+            content: "▶";
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-left: 8px;
+        }
+
+        .card-info:not(.collapsed) .info-title::after {
+            content: "▼";
+        }
+
+        .card-info.collapsed .info-body {
+            display: none;
+        }
+
+        .info-body {
+            display: block;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #28445a;
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #d0e0f0;
+            white-space: pre-wrap;
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: var(--text-sub);
+            padding: 24px 10px;
+            font-size: 1rem;
+            grid-column: 1 / -1;
+        }
+
+        .add-form, .backup-section {
+            background: #1a1a1a;
+            border: 1px dashed #555;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 25px;
+        }
+
+        .add-form h3, .backup-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+        }
+
+        .add-form input, .add-form select, .add-form textarea {
+            width: 100%;
+            padding: 11px;
+            margin-bottom: 10px;
+            background: #252525;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+
+        .add-form textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .add-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.05rem;
+        }
+
+        .backup-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        @media (min-width: 600px) {
+            .backup-buttons {
+                flex-direction: row;
+            }
+        }
+
+        .backup-btn {
+            flex: 1;
+            padding: 12px;
+            background: #2a2a2a;
+            color: #fff;
+            border: 1px solid #555;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .backup-btn.primary {
+            background: #1976d2;
+            border-color: #2196f3;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.75);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid var(--accent-color);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        .modal-content h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        .modal-content label {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            display: block;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+        .modal-content input, .modal-content select, .modal-content textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 12px;
+            background: #252525;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .modal-content textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .modal-btn {
+            flex: 1;
+            padding: 11px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        .modal-btn.cancel {
+            background: #333;
+            color: #ccc;
+        }
+        .modal-btn.save {
+            background: var(--accent-color);
+            color: #000;
+        }
+    </style>
+</head>
+<body id="bodyRoot">
+
+    <div class="app-container">
+        <h1>STREET FIGHTER 6 辞書</h1>
+
+        <!-- 🎯 本日の課題と目標（全体共通マネージャー） -->
+        <div class="global-manager-container">
+            <div class="global-manager-title">🎯 本日の課題と目標（全体共通マネージャー）</div>
+            
+            <div class="goal-box">
+                <div class="goal-box-title">■ 本日のフリーメモ・意識目標</div>
+                <textarea id="globalFreeGoalInput" class="goal-textarea" placeholder="目指せハイマス！！" oninput="saveGlobalFreeGoal()"></textarea>
+            </div>
+
+            <div id="globalTasksContainer"></div>
+
+            <div class="task-add-form">
+                <h4>＋ 課題の追加</h4>
+                <input type="text" id="newTaskCat" placeholder="カテゴリー名 (例: 最優先で習得・練習すべきこと)">
+                <input type="text" id="newTaskTitle" placeholder="課題タイトル (例: 起き攻めの徹底)">
+                <textarea id="newTaskDetail" placeholder="詳細・メモを入力..." style="height: 50px;"></textarea>
+                <button class="task-add-btn" onclick="addGlobalTask()">課題を追加</button>
+            </div>
+        </div>
+
+        <div class="controls-wrapper">
+            <div class="char-selector-container">
+                <select id="charSelect" class="char-select" onchange="onCharSelectChange(this.value)"></select>
+                <div class="char-action-row">
+                    <button class="char-select-btn" onclick="moveCurrentCharacter(-1)" title="前へ移動">◀</button>
+                    <button class="char-select-btn" onclick="moveCurrentCharacter(1)" title="次へ移動">▶</button>
+                    <button class="char-select-btn" id="btnRenameChar" onclick="promptRenameCharacter()" title="選択中のキャラ名を変更">✏️名前変更</button>
+                    <button class="char-select-btn danger" id="btnDeleteChar" onclick="deleteCurrentCharacter()" title="選択中のキャラを削除">🗑削除</button>
+                    <button class="char-select-btn" onclick="promptAddCharacter()">＋追加</button>
+                </div>
+            </div>
+
+            <div class="section-switch-container" id="sectionSwitchContainer">
+                <button class="section-switch-btn active" id="btnSwitchCombo" onclick="setActiveSection('combo')">コンボレシピ</button>
+                <button class="section-switch-btn" id="btnSwitchInfo" onclick="setActiveSection('info')">解説・立ち回り</button>
+                <button class="section-switch-btn" id="btnSwitchMatchup" onclick="setActiveSection('matchup')">キャラ対策</button>
+                <button class="section-switch-btn" id="btnSwitchFrame" onclick="setActiveSection('frame')">フレーム・技表</button>
+            </div>
+
+            <div class="filter-container" id="filterContainerBox">
+                <div class="filter-title">絞り込みフィルター & 機能</div>
+                <div class="filter-buttons" id="statusFilterButtons">
+                    <button class="filter-btn active" onclick="setStatusFilter('all', this)">すべて表示</button>
+                    <button class="filter-btn" onclick="setStatusFilter('todo', this)">未完了 (0個)</button>
+                    <button class="filter-btn" onclick="setStatusFilter('done', this)">完了 (1以上達成)</button>
+                    <button class="filter-btn toggle-btn" id="btnCollapseDone" onclick="toggleCollapseDone()">🙈 完了済みを折りたたむ</button>
+                    <button class="filter-btn reset-all-btn" onclick="resetAllCombosForCurrentChar()" title="このキャラクターの全コンボ進捗をリセット">🔄 全リセット</button>
+                </div>
+            </div>
+
+            <div class="search-box-wrapper">
+                <input type="text" id="searchInput" class="search-box" placeholder="キーワード検索 (例: 1, 屈弱P, 起き攻め)..." oninput="applyFilters()">
+                <span class="search-shortcut-badge" title="ショートカットキー: /">/</span>
+            </div>
+        </div>
+
+        <div id="overallProgressContainer" class="overall-progress-banner" style="display:none;">
+            <div class="overall-progress-title">🎯 コンボマスター達成度</div>
+            <div id="overallProgressText" class="overall-progress-stats">0 / 0 完了 (0%)</div>
+        </div>
+
+        <div id="mainContentContainer"></div>
+
+        <div class="add-form">
+            <h3 id="formTitle">＋ 新しいメモ・解説の追加</h3>
+            <select id="newType" onchange="toggleFormType()">
+                <option value="combo">コンボレシピ ＋ 起き攻め</option>
+                <option value="info">解説・立ち回り</option>
+                <option value="matchup">キャラ対策</option>
+                <option value="frame">フレーム・技表</option>
+            </select>
+            
+            <input type="text" id="newCatInput" list="catListOptions" placeholder="カテゴリー名を入力または選択 (例: 小技、新セットプレイ、対リュウ)">
+            <datalist id="catListOptions"></datalist>
+
+            <input type="text" id="newTitle" placeholder="タイトル (例: 対策ポイント、コンボメモなど)">
+            <textarea id="newRecipe" placeholder="内容やレシピを入力..."></textarea>
+            <textarea id="newOkizeme" placeholder="起き攻め・シチュエーションを入力 (任意)..."></textarea>
+            <button class="add-btn" id="addBtn" onclick="addCustomItem()">追加する</button>
+        </div>
+
+        <!-- 📱 バックアップ・データ管理 -->
+        <div class="backup-section">
+            <h3>データ管理・バックアップ</h3>
+            <div style="font-size: 0.9rem; color: var(--text-sub); margin-bottom: 12px;">
+                スマホでもLINEやメモ帳にテキストを保存するだけで簡単にバックアップ・復元ができます。
+            </div>
+            <div class="backup-buttons">
+                <button class="backup-btn primary" onclick="copyDataToClipboard()">📋 クリップボードへコピー (簡単保存)</button>
+                <button class="backup-btn" onclick="openTextImportModal()">📥 テキスト貼り付けで復元</button>
+                <button class="backup-btn" onclick="exportData()">💾 JSONファイル保存</button>
+                <button class="backup-btn" onclick="document.getElementById('importFile').click()">📂 ファイル読み込み</button>
+                <input type="file" id="importFile" style="display:none" accept=".json" onchange="importData(event)">
+            </div>
+        </div>
+    </div>
+
+    <!-- 編集用モーダル -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>✏️ データの編集</h3>
+            <input type="hidden" id="editItemId">
+            <label>セクション / タイプ変更</label>
+            <select id="editTypeInput">
+                <option value="combo">コンボレシピ</option>
+                <option value="info">解説・立ち回り</option>
+                <option value="matchup">キャラ対策</option>
+                <option value="frame">フレーム・技表</option>
+            </select>
+            <label>タイトル</label>
+            <input type="text" id="editTitleInput" placeholder="タイトルを入力">
+            <label>内容 / レシピ (改行可能)</label>
+            <textarea id="editRecipeInput" placeholder="内容を入力"></textarea>
+            <label>起き攻め・シチュエーション (改行可能)</label>
+            <textarea id="editOkizemeInput" placeholder="起き攻めを入力"></textarea>
+            <label>カテゴリー名</label>
+            <input type="text" id="editCatInput" placeholder="カテゴリー名を入力">
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeEditModal()">キャンセル</button>
+                <button class="modal-btn save" id="modalSaveBtn" onclick="saveEditedItem()">保存する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 スマホ用テキスト復元モーダル -->
+    <div id="textImportModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3>📥 バックアップテキストの復元</h3>
+            <label>コピーしたバックアップテキストを貼り付けてください</label>
+            <textarea id="importTextInput" placeholder="ここにテキストを貼り付け..."></textarea>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeTextImportModal()">キャンセル</button>
+                <button class="modal-btn save" onclick="restoreFromText()">復元を実行</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fixedTopCategories = ["共通アクション", "トレモメニュー", "用語欄"];
+
+        const categoryThemes = {
+            "共通アクション": { accent: "#00bcd4", headerBg: "#002228", subBg: "#004d40" },
+            "トレモメニュー": { accent: "#ec407a", headerBg: "#331222", subBg: "#880e4f" },
+            "用語欄": { accent: "#ab47bc", headerBg: "#2a1233", subBg: "#4a148c" },
+            "default": { accent: "#ff9800", headerBg: "#2d1a00", subBg: "#402400" }
+        };
+
+        const defaultData = {
+            "共通アクション": [
+                { type: "info", id: "common_info_1", cat: "守り・切り返し", title: "投げ抜け・シミーの基本意識", recipe: "・相手の重ねに対しては遅らせグラップを仕込む\n・相手が投げ抜けを読んで後ろに歩いてスカしてきたら（シミー）、大ゴア等で痛い反撃を入れる" }
+            ],
+            "トレモメニュー": [
+                { type: "info", id: "tremo_1", cat: "練習メニュー", title: "毎日の基本メニュー", recipe: "1. 対空練習（10分）\n2. ドライブパリィ・ラッシュ仕込み（10分）\n3. 実戦形式のコンボ確認（10分）" }
+            ],
+            "用語欄": [
+                { type: "info", id: "glossary_1", cat: "基本用語", title: "フレームとは", recipe: "・格闘ゲームの時間の最小単位。1秒間に60フレーム進む。" }
+            ],
+            "豪鬼": [
+                // --- 小技 ---
+                { type: "combo", id: "gouki_c_01", cat: "小技", title: "① 屈弱P×2 → 弱K → 強昇竜", recipe: "屈弱P×2 → 弱K → 強昇竜", okizeme: "dr.前中P or dr.屈弱K（ヒット+7F, ガード+1F）\n（端）中K消費 +4F → 投げ or シミー\nor 弱P×2消費 +8F → 立中P持続（ガード+4F）" },
+                { type: "combo", id: "gouki_c_02", cat: "小技", title: "② 屈弱P×2 → 立弱K → 中竜巻", recipe: "屈弱P×2 → 立弱K → 中竜巻", okizeme: "前ステ×2 +3F or 屈弱K消費 → dr.前大P（+3F）" },
+                { type: "combo", id: "gouki_c_03", cat: "小技", title: "③ （端）屈弱P×2 → 弱K → 弱竜巻 → 強竜巻", recipe: "（端）屈弱P×2 → 弱K → 弱竜巻 → 強竜巻", okizeme: "屈中P消費 +8F → 立中P持続（ガード+1F）" },
+                { type: "combo", id: "gouki_c_04", cat: "小技", title: "④ 屈弱P×2 → 立弱K cr. → 屈弱P → 屈弱P → 強竜巻（派生）", recipe: "屈弱P×2 → 立弱K cr. → 屈弱P → 屈弱P → 強竜巻\n└→ 弱竜巻 → SA\n└→ 強灼火 → 昇竜", okizeme: "②を参考に" },
+                { type: "combo", id: "gouki_c_05", cat: "小技", title: "⑤ 屈弱P×2 → 立弱K → 弱灼火", recipe: "屈弱P×2 → 立弱K → 弱灼火（※微歩き → 投げ）", okizeme: "" },
+
+                // --- 中技 ---
+                { type: "combo", id: "gouki_c_06", cat: "中技", title: "⑥ 屈中P → 屈中P → 中竜巻", recipe: "屈中P → 屈中P → 中竜巻", okizeme: "前歩き → 投げ or シミー（歩き +3F）\n屈弱K消費 → dr.前大P（ガード+3F, ヒット+10F）" },
+                { type: "combo", id: "gouki_c_07", cat: "中技", title: "⑦ （近）屈中P → 中PTC → 強竜巻", recipe: "（近）屈中P → 中PTC → 強竜巻", okizeme: "前ステ → 前大P（ガード±0F, ヒット+7F）\ndr.前中P持続 → 強P → 強灼火（ガード+1F, ヒット+5F）\ndr.屈弱K → 中K → 中竜巻（ガード+1F, ヒット+7F）\n前ステ → 歩き投げ or シミー\n（端）中K消費 → 中P（ガード+2F, ヒット+6F）\n　　　　　└→ 強P（ガード-3F, ヒット+3F）" },
+                { type: "combo", id: "gouki_c_08", cat: "中技", title: "⑧ 屈中P → 屈中P → OD灼火", recipe: "屈中P → 屈中P → OD灼火", okizeme: "阿修羅（+12F）→ 強P（ガード±0F, ヒット+3F）\n　　　　　　　└→ 投げ or シミー" },
+                { type: "combo", id: "gouki_c_09", cat: "中技", title: "⑨ 屈中P×2 → 前大P → 屈強P → 大竜巻", recipe: "屈中P×2 → 前大P → 屈強P → 大竜巻", okizeme: "前ステ → 前大P or dr.前中P → 強P or dr.屈弱K → 中K\n　　　　　　　　　　└→ 投げ or シミー\n（端）中K消費 → 中P or 強P" },
+
+                // --- 強技 ---
+                { type: "combo", id: "gouki_c_10", cat: "強技", title: "⑩ 屈中P×2 → OD灼火 → 屈強P → 弱波動 → 強竜巻", recipe: "屈中P×2 → OD灼火 → 屈強P → 弱波動 → 強竜巻", okizeme: "中K消費 +5F → 投げ or シミー\n屈弱P → 立弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_11", cat: "強技", title: "⑪ 強P → 強灼火", recipe: "強P → 強灼火", okizeme: "前ステ×2（+9F）→ 引強K → 弱波動（ガード-4F）\n　　　　　　　　└→ 微歩き投げ or シミー\n前ステ → dr.前中P（ガード+1F, ヒット+7F）\n　　　　└→ dr.屈弱K（ガード+1F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_12", cat: "強技", title: "⑫ 強P → 強灼火 → 大竜巻（端）", recipe: "強P → 強灼火 → 大竜巻（端）", okizeme: "中K消費で +5F → 投げ or シミー\n屈弱P → 弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_13", cat: "強技", title: "⑬ 強P cr. → 前大P → 屈強 cr. → 前大P → 屈強P → 強灼火", recipe: "強P cr. → 前大P → 屈強 cr. → 前大P → 屈強P → 強灼火", okizeme: "" },
+
+                // --- OD灼火 ---
+                { type: "combo", id: "gouki_c_14", cat: "OD灼火", title: "⑭ 強P → OD灼火 → 引強K → OD最大溜め波動 → 中竜巻 → 大竜巻", recipe: "強P → OD灼火 → 引強K → OD最大溜め波動 → 中竜巻 → 大竜巻", okizeme: "屈弱P → 立弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）\n中K消費 +5F → 投げ or シミー" },
+                { type: "combo", id: "gouki_c_15", cat: "OD灼火", title: "⑮ 強P → OD灼火 → 引強K → OD最大溜め波動 → OD竜巻 → OD昇龍", recipe: "強P → OD灼火 → 引強K → OD最大溜め波動 → OD竜巻 → OD昇龍", okizeme: "リーサル判断" },
+                { type: "combo", id: "gouki_c_16", cat: "OD灼火", title: "⑯ 強P → OD灼火 → 前強PTC×2 → 強竜巻", recipe: "強P → OD灼火 → 前強PTC×2 → 強竜巻", okizeme: "中K消費（+5F）→ 投げ or シミー\n屈弱P → 弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_17", cat: "OD灼火", title: "⑰ 強P → OD灼火 → dr.前中K → 引強K → 微タメ波動 → 大竜巻", recipe: "強P → OD灼火 → dr.前中K → 引強K → 微タメ波動 → 大竜巻", okizeme: "中K消費（+5F）→ 投げ or シミー\n屈弱P → 弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_18", cat: "OD灼火", title: "⑱ 強P → OD灼火 → dr.前強PTC×2 → 大竜巻", recipe: "強P → OD灼火 → dr.前強PTC×2 → 大竜巻", okizeme: "中K消費（+5F）→ 投げ or シミー\n屈弱P → 弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）" },
+                { type: "combo", id: "gouki_c_19", cat: "OD灼火", title: "⑲ 強P → OD灼火 → 引強K → OD最大溜め波動 → dr.屈強P cr. → 引強K → 強百鬼K → SA1 or 2", recipe: "強P → OD灼火 → 引強K → OD最大溜め波動 → dr.屈強P cr. → 引強K → 強百鬼K → SA1 or 2", okizeme: "" },
+                { type: "combo", id: "gouki_c_20", cat: "OD灼火", title: "⑳ 強P → OD灼火 → 引強K → OD最大溜め波動 → dr.引強K → OD百鬼竜巻 → SA1 or 2", recipe: "強P → OD灼火 → 引強K → OD最大溜め波動 → dr.引強K → OD百鬼竜巻 → SA1 or 2", okizeme: "" },
+                { type: "combo", id: "gouki_c_21", cat: "OD灼火", title: "㉑ 強P → OD灼火 → 引強K → OD最大溜め波動 → OD斬空 → 中竜巻 → 弱昇龍 → SA3", recipe: "強P → OD灼火 → 引強K → OD最大溜め波動 → OD斬空 → 中竜巻 → 弱昇龍 → SA3", okizeme: "" },
+
+                // --- 中足ラッシュ ---
+                { type: "combo", id: "gouki_c_22", cat: "中足ラッシュ", title: "㉒ 屈中K cr. → 屈中P → 屈強P → 中 or 強竜巻", recipe: "屈中K cr. → 屈中P → 屈強P → 中 or 強竜巻", okizeme: "中竜巻：前ステ×2（+3F）→ 投げ or シミー\n　　　　屈弱K → dr.前強P（ガード+3F, ヒット+10F）\n大竜巻：前ステ → 前強P（ガード±0F, ヒット+7F）\n　　　　dr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）\n　　　　前ステ → dr.立弱P（ガード+4F, ヒット9F）" },
+                { type: "combo", id: "gouki_c_23", cat: "中足ラッシュ", title: "㉓ 屈中K cr. → 強P → 中PTC → 大竜巻", recipe: "屈中K cr. → 強P → 中PTC → 大竜巻", okizeme: "前ステ → 前強P（ガード±0F, ヒット+7F）\ndr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）\n前ステ → dr.立弱P（ガード+4F, ヒット9F）" },
+                { type: "combo", id: "gouki_c_24", cat: "中足ラッシュ", title: "㉔ 屈中K cr. → 強P → 中K → 弱竜巻 → 大昇竜", recipe: "屈中K cr. → 強P → 中K → 弱竜巻 → 大昇竜", okizeme: "dr.前中P or dr.屈弱K（ガード+1F, ヒット+7F）\n（ディレイ）dr.前強P（ガード2〜4F, ヒット9〜11F）" },
+                { type: "combo", id: "gouki_c_25", cat: "中足ラッシュ", title: "㉕ 屈中K cr. → 屈中P → 屈強P → 弱竜巻 → 大昇竜", recipe: "屈中K cr. → 屈中P → 屈強P → 弱竜巻 → 大昇竜", okizeme: "前中P or 屈弱K（ガード+1F, ヒット+7F）\ndr.前強P（ガード2〜4F, ヒット9〜11F）" },
+                { type: "combo", id: "gouki_c_26", cat: "中足ラッシュ", title: "㉖ （端）屈中K cr. → 屈中P → 屈強P → 強灼火 → 強竜巻", recipe: "（端）屈中K cr. → 屈中P → 屈強P → 強灼火 → 強竜巻", okizeme: "中K消費 +5F → 投げ or シミー\n屈弱P → 弱P消費（+8F）→ 中P（ガード+4F, ヒット+7F）\n屈中P消費（+7F）→ 中P（ガード+1F, ヒット+5F）" },
+                { type: "combo", id: "gouki_c_27", cat: "中足ラッシュ", title: "㉗ （デカキャラ）屈中K cr. → 屈中P → 屈強P → 弱竜巻 → 大竜巻", recipe: "（デカキャラ）屈中K cr. → 屈中P → 屈強P → 弱竜巻 → 大竜巻", okizeme: "前ステ → dr.立弱P（ガード+3F, ヒット+8F）\ndr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）" },
+                { type: "combo", id: "gouki_c_28", cat: "中足ラッシュ", title: "㉘ （デカキャラ）屈中K cr. → 屈中P → 中PTC → 弱竜巻 → 大竜巻", recipe: "（デカキャラ）屈中K cr. → 屈中P → 中PTC → 弱竜巻 → 大竜巻", okizeme: "前ステ → dr.立弱P（ガード+3F, ヒット+8F）\ndr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）" },
+                { type: "combo", id: "gouki_c_29", cat: "中足ラッシュ", title: "㉙ （ガード時）屈中K cr. → 屈弱P → 投げ or シミー", recipe: "（ガード時）屈中K cr. → 屈弱P → 投げ or シミー", okizeme: "" },
+                { type: "combo", id: "gouki_c_30", cat: "中足ラッシュ", title: "㉚ （ガード時）屈中K cr. → 中P → 投げ or シミー", recipe: "（ガード時）屈中K cr. → 中P → 投げ or シミー", okizeme: "" },
+                { type: "combo", id: "gouki_c_31", cat: "中足ラッシュ", title: "㉛ （ガード時）屈中K cr. → 中P → 中PTC → 弱波動", recipe: "（ガード時）屈中K cr. → 中P → 中PTC → 弱波動", okizeme: "" },
+                { type: "combo", id: "gouki_c_32", cat: "中足ラッシュ", title: "㉜ 屈中K cr. → 中P → 屈中P → 屈中P → 微遅らせ弱竜巻 → 中竜巻", recipe: "屈中K cr. → 中P → 屈中P → 屈中P → 微遅らせ弱竜巻 → 中竜巻", okizeme: "前ステ×2（+3F）→ 投げ or シミー\n屈弱K → dr.前強P（ガード+3F, ヒット+10F）" },
+                { type: "combo", id: "gouki_c_33", cat: "中足ラッシュ", title: "㉝ 屈中P or 強P → 前強P → 屈強P → 中 or 強竜巻", recipe: "屈中P or 強P → 前強P → 屈強P → 中 or 強竜巻", okizeme: "中竜巻：前ステ×2（+3F）→ 投げ or シミー\n　　　　屈弱K → dr.前強P（ガード+3〜4F, ヒット+10〜11F）\n大竜巻：前ステ → 前強P（ガード±0F, ヒット+7F）\n　　　　dr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）\n　　　　前ステ → dr.弱P（ガード+4F, ヒット9F）" },
+
+                // --- 生ラッシュコンボ ---
+                { type: "combo", id: "gouki_c_34", cat: "生ラッシュコンボ", title: "㉞ 屈中P or 強P → 強K → 中PTC → 強竜巻", recipe: "屈中P or 強P → 強K → 中PTC → 強竜巻", okizeme: "前ステ → 前強P（ガード±0F, ヒット+7F）\ndr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）\n前ステ → dr.弱P（ガード+4F, ヒット9F）" },
+                { type: "combo", id: "gouki_c_35", cat: "生ラッシュコンボ", title: "㉟ dr.前中P → 中K → 中竜巻", recipe: "dr.前中P → 中K → 中竜巻", okizeme: "前ステ×2（+3F）→ 投げ or シミー\n屈弱K → dr.前強P（ガード+3F, ヒット+10F）" },
+                { type: "combo", id: "gouki_c_36", cat: "生ラッシュコンボ", title: "㊱ dr.前中P → 中K cr. → 前強P → 屈強P → 強竜巻", recipe: "dr.前中P → 中K cr. → 前強P → 屈強P → 強竜巻", okizeme: "前ステ → 前大P（ガード±0F, ヒット+7F）\ndr.（ディレイ）前強P（ガード2〜4F, ヒット9〜11F）\n前ステ → dr.弱P（ガード+4F, ヒット9F）" },
+                { type: "combo", id: "gouki_c_37", cat: "生ラッシュコンボ", title: "㊲ （端）dr.前中P → 中K → OD灼火 〜", recipe: "（端）dr.前中P → 中K → OD灼火 〜", okizeme: "" },
+
+                // --- パニカンコンボ ---
+                { type: "combo", id: "gouki_c_38", cat: "パニカンコンボ", title: "㊸ dr.屈弱K → 中K → 中竜巻 or 強竜巻", recipe: "dr.屈弱K → 中K → 中竜巻 or 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_39", cat: "パニカンコンボ", title: "㊹ dr.屈弱K → 中K cr. → 前強P → 屈強P → 強竜巻", recipe: "dr.屈弱K → 中K cr. → 前強P → 屈強P → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_40", cat: "パニカンコンボ", title: "㊺ （PC）屈中P → 強P → 中竜巻", recipe: "（PC）屈中P → 強P → 中竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_41", cat: "パニカンコンボ", title: "㊻ 屈中P → 強P → 強灼火（PC）", recipe: "屈中P → 強P → 強灼火（PC）", okizeme: "" },
+                { type: "combo", id: "gouki_c_42", cat: "パニカンコンボ", title: "㊼ （PC）前強P → 中K → 中竜巻", recipe: "（PC）前強P → 中K → 中竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_43", cat: "パニカンコンボ", title: "㊽ （PC）前強P → 中K → 弱竜巻 → 大昇竜", recipe: "（PC）前強P → 中K → 弱竜巻 → 大昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_44", cat: "パニカンコンボ", title: "㊾ （PC）前強P → 屈中K → OD竜巻 → 中昇竜", recipe: "（PC）前強P → 屈中K → OD竜巻 → 中昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_45", cat: "パニカンコンボ", title: "㊿ （PC）大K → 屈強P → 弱竜巻 → 強昇竜", recipe: "（PC）大K → 屈強P → 弱竜巻 → 強昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_46", cat: "パニカンコンボ", title: "50 （PC）大K → 屈強P → 強灼火", recipe: "（PC）大K → 屈強P → 強灼火", okizeme: "" },
+                { type: "combo", id: "gouki_c_47", cat: "パニカンコンボ", title: "51 （PC）強灼火1 → 引強K → 中竜巻 → 強昇竜", recipe: "（PC）強灼火1 → 引強K → 中竜巻 → 強昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_48", cat: "パニカンコンボ", title: "52 （PC）強灼火 → 弱波動 → dr.屈中K → 大竜巻", recipe: "（PC）強灼火 → 弱波動 → dr.屈中K → 大竜巻", okizeme: "" },
+
+                // --- インパクトコンボ ---
+                { type: "combo", id: "gouki_c_49", cat: "インパクトコンボ", title: "53 （PC）強灼火 → 引強K → 弱波動 → 強P → 中竜巻", recipe: "（PC）強灼火 → 引強K → 弱波動 → 強P → 中竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_50", cat: "インパクトコンボ", title: "54 （PC）強灼火 → 引強K → OD百鬼竜巻 → 強竜巻", recipe: "（PC）強灼火 → 引強K → OD百鬼竜巻 → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_51", cat: "インパクトコンボ", title: "55 （DIH）前ステ → 引強K → 中竜巻 → 強昇竜", recipe: "（DIH）前ステ → 引強K → 中竜巻 → 強昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_52", cat: "インパクトコンボ", title: "56 （DIH）前ステ → 引強K → 弱波動 → dr.屈中K → 強竜巻", recipe: "（DIH）前ステ → 引強K → 弱波動 → dr.屈中K → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_53", cat: "インパクトコンボ", title: "57 （DIH）前ステ → 引強K → 弱波動 → dr.強P → 中竜巻", recipe: "（DIH）前ステ → 引強K → 弱波動 → dr.強P → 中竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_54", cat: "インパクトコンボ", title: "58 （DIG）屈大P → 弱波動 → 強竜巻", recipe: "（DIG）屈大P → 弱波動 → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_55", cat: "インパクトコンボ", title: "59 （DIG）前強PTC×2 → 強竜巻", recipe: "（DIG）前強PTC×2 → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_56", cat: "インパクトコンボ", title: "60 （DI HorG）屈強P → 中竜巻 → 弱昇竜", recipe: "（DI HorG）屈強P → 中竜巻 → 弱昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_57", cat: "インパクトコンボ", title: "61 （DIG）dr.屈強P → OD百鬼波動 → 引強K → 微タメ波動 → dr.屈強P cr. → 引強K → 百鬼K → SA1 or 2", recipe: "（DIG）dr.屈強P → OD百鬼波動 → 引強K → 微タメ波動 → dr.屈強P cr. → 引強K → 百鬼K → SA1 or 2", okizeme: "" },
+                { type: "combo", id: "gouki_c_58", cat: "インパクトコンボ", title: "62 （DIG）OD灼火 → dr.屈強P cr. 屈強P → 中竜巻 → 弱昇竜 → SA3", recipe: "（DIG）OD灼火 → dr.屈強P cr. 屈強P → 中竜巻 → 弱昇竜 → SA3", okizeme: "" },
+                { type: "combo", id: "gouki_c_59", cat: "インパクトコンボ", title: "63 屈中P（PC）→ 強P → 強灼火", recipe: "屈中P（PC）→ 強P → 強灼火", okizeme: "" },
+
+                // --- 対空・空中コンボ ---
+                { type: "combo", id: "gouki_c_60", cat: "対空・空中コンボ", title: "64 J中P → OD竜巻 → 強昇竜", recipe: "J中P → OD竜巻 → 強昇竜", okizeme: "" },
+                { type: "combo", id: "gouki_c_61", cat: "対空・空中コンボ", title: "65 J中P → 斬空 → dr.強P → 強竜巻", recipe: "J中P → 斬空 → dr.強P → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_62", cat: "対空・空中コンボ", title: "66 J中P → 斬空 → dr.屈中K → 強竜巻", recipe: "J中P → 斬空 → dr.屈中K → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_63", cat: "対空・空中コンボ", title: "67 J中P → 斬空 → dr.強P → 中竜巻 → 弱昇竜（端）", recipe: "J中P → 斬空 → dr.強P → 中竜巻 → 弱昇竜（端）", okizeme: "" },
+                { type: "combo", id: "gouki_c_64", cat: "対空・空中コンボ", title: "68 J中P → OD波動 → dr.引強K → 弱波動 → ラッシュ強P → 強灼火 → SA3", recipe: "J中P → OD波動 → dr.引強K → 弱波動 → ラッシュ強P → 強灼火 → SA3", okizeme: "" },
+                { type: "combo", id: "gouki_c_65", cat: "対空・空中コンボ", title: "69 J中P → 空中SA1 → OD灼火 → 強竜巻", recipe: "J中P → 空中SA1 → OD灼火 → 強竜巻", okizeme: "" },
+                { type: "combo", id: "gouki_c_66", cat: "対空・空中コンボ", title: "70 J中P → 空中SA1 → OD灼火 → SA2 → 引強K → 百鬼K → 強竜巻", recipe: "J中P → 空中SA1 → OD灼火 → SA2 → 引強K → 百鬼K → 強竜巻", okizeme: "" },
+
+                // --- 固め連携 ---
+                { type: "combo", id: "gouki_c_67", cat: "固め連携", title: "71 弱P → 中K → 強K（タゲコン）", recipe: "弱P → 中K → 強K（タゲコン）", okizeme: "固め連携1" },
+                { type: "combo", id: "gouki_c_68", cat: "固め連携", title: "72 弱K → 強灼火1段止め", recipe: "弱K → 強灼火1段止め", okizeme: "固め連携2" },
+                { type: "combo", id: "gouki_c_69", cat: "固め連携", title: "73 斬空 → ラッシュ密着中P TC → OD波動 → 中P TC → OD波動 → 2中P → 中灼火派生 → SA3", recipe: "斬空 → ラッシュ密着中P TC → OD波動 → 中P TC → OD波動 → 2中P → 中灼火派生 → SA3", okizeme: "連ガ削り連携1" },
+                { type: "combo", id: "gouki_c_70", cat: "固め連携", title: "74 百鬼P → 弱K → OD波動 → 弱K → OD波動 → 弱K → OD波動 → SA3", recipe: "百鬼P → 弱K → OD波動 → 弱K → OD波動 → 弱K → OD波動 → SA3", okizeme: "連ガ削り連携2" },
+                { type: "combo", id: "gouki_c_71", cat: "固め連携", title: "75 強灼火 → 立弱K → 弱灼火", recipe: "強灼火 → 立弱K → 弱灼火", okizeme: "相手BO後の連携" },
+                { type: "combo", id: "gouki_c_72", cat: "固め連携", title: "76 鬼削り連携：4大K → OD波動", recipe: "4大K → OD波動", okizeme: "鬼削り連携" },
+                { type: "combo", id: "gouki_c_73", cat: "固め連携", title: "77 鬼削り連携：小K → OD波動", recipe: "小K → OD波動", okizeme: "鬼削り連携" },
+                { type: "combo", id: "gouki_c_74", cat: "固め連携", title: "78 鬼削り連携：2中P → 中灼火 → SA3", recipe: "2中P → 中灼火 → SA3", okizeme: "鬼削り連携" },
+
+                // --- 起き攻め・セットプレイ ---
+                { type: "combo", id: "gouki_c_75", cat: "起き攻め・セットプレイ", title: "79 （画面中央）弱竜巻 > 2強K → ラッシュ朧（全部最速入力）", recipe: "弱竜巻 > 2強K → ラッシュ朧（全部最速入力）", okizeme: "※弱竜巻近め当て、小技3発からの弱竜大足等\n距離が遠い場合は阿修羅→朧の派生を遅らせる" },
+
+                // --- 高難易度・スタンコンボ ---
+                { type: "combo", id: "gouki_c_76", cat: "高難易度・スタンコンボ", title: "80 高難易度コンボ①", recipe: "9HP → 2HP → 214PP+6P → 2HPcr → 2HP → 236(微タメ) → dr.5MPcr → 4HK(ディレイ) → 214HP+6 → 623LP → SA3", okizeme: "" },
+                { type: "combo", id: "gouki_c_77", cat: "高難易度・スタンコンボ", title: "81 高難易度コンボ②", recipe: "9HP → 2HP → 214PP+6P → 4HK → 236(微タメ) → dr.2HPcr → 4HK(ディレイ)cr → 4HK → 236HK+K → 214MK → 623LP → SA3", okizeme: "" },
+                { type: "combo", id: "gouki_c_78", cat: "高難易度・スタンコンボ", title: "82 スタンコンボ（2ゲージ以下・SAゲージ回収）", recipe: "（2ゲージ以下）J強P → 中PTC → OD灼火 → 屈強P → 中竜巻 → 弱昇竜", okizeme: "相手の体力が黄色の時に使えるSAゲージ回収コンボ" },
+                { type: "combo", id: "gouki_c_79", cat: "高難易度・スタンコンボ", title: "83 スタンコンボ（3ゲージ以上・SAゲージ回収）", recipe: "（3ゲージ以上）J強P → 中PTC → (CR)強K → (微歩き) → 2中P → 中PTC → OD灼火 → 屈強P → 中竜巻 → 弱昇竜", okizeme: "相手の体力が黄色の時に使えるSAゲージ回収コンボ" },
+                { type: "combo", id: "gouki_c_80", cat: "高難易度・スタンコンボ", title: "84 スタンコンボ（全ゲージ・SAゲージ回収）", recipe: "（全ゲージ）(歩き)強K → 屈中P → 屈中P → (CR)強K → (微歩き4F)屈中P → 中PTC → (CR)強K → (微歩き4F)屈中P → 中PTC → 弱竜巻 → 弱昇竜", okizeme: "相手の体力が黄色の時に使えるSAゲージ回収コンボ" },
+                { type: "combo", id: "gouki_c_81", cat: "高難易度・スタンコンボ", title: "85 スタンコンボ（黄色体力の半分くらい）", recipe: "（黄色体力の半分くらい）朧（簡単で効率がいい）", okizeme: "相手の体力が黄色の時に使えるSAゲージ回収コンボ" },
+
+                // --- 解説・フレーム ---
+                { type: "info", id: "gouki_note_1", cat: "立ち回り・基本コンセプト", title: "豪鬼は何するキャラ？", recipe: "・リーチの長い技でゲージ回復しつつ、リターンをとる。\n・常に画面端を狙うキャラ。" },
+                
+                // --- キャラ対策（サンプル初期項目） ---
+                { type: "matchup", id: "gouki_mu_1", cat: "キャラ対策メモ", title: "豪鬼戦の意識ポイント（サンプル）", recipe: "・体力9000なのでワンチャンスの火力を逃さない\n・百鬼襲は立ち強Kや昇竜で落とす意識を持つ" },
+
+                { type: "frame", id: "gouki_f_1", cat: "通常技 (立ち)", title: "立ち弱P (面割り)", recipe: "発生: 4 | 持続: 4-6 | 硬直: 7 | ヒット: +4 | ガード: -1" },
+                { type: "frame", id: "gouki_f_2", cat: "通常技 (立ち)", title: "立ち弱K (脛斬り)", recipe: "発生: 5 | 持続: 5-7 | 硬直: 11 | ヒット: +2 | ガード: -4" },
+                { type: "frame", id: "gouki_f_3", cat: "通常技 (立ち)", title: "立ち中P (豪掌)", recipe: "発生: 6 | 持続: 6-9 | 硬直: 11 | ヒット: +4 | ガード: +1" },
+                { type: "frame", id: "gouki_f_4", cat: "通常技 (立ち)", title: "立ち中K (臑潰し)", recipe: "発生: 7 | 持続: 7-11 | 硬直: 15 | ヒット: +3 | ガード: -3" },
+                { type: "frame", id: "gouki_f_5", cat: "通常技 (立ち)", title: "立ち強P (岩砕突き)", recipe: "発生: 9 | 持続: 9-13 | 硬直: 18 | ヒット: +3 | ガード: -3" },
+                { type: "frame", id: "gouki_f_6", cat: "通常技 (立ち)", title: "立ち強K (首撥ね)", recipe: "発生: 13 | 持続: 13-27 | 硬直: 15 | ヒット: +7 | ガード: +3" },
+
+                { type: "frame", id: "gouki_f_7", cat: "通常技 (しゃがみ)", title: "しゃがみ弱P (足止め)", recipe: "発生: 4 | 持続: 4-5 | 硬直: 9 | ヒット: +5 | ガード: -1" },
+                { type: "frame", id: "gouki_f_8", cat: "通常技 (しゃがみ)", title: "しゃがみ弱K (楔打ち)", recipe: "発生: 5 | 持続: 5-6 | 硬直: 10 | ヒット: +3 | ガード: -3" },
+                { type: "frame", id: "gouki_f_9", cat: "通常技 (しゃがみ)", title: "しゃがみ中P (脛折り豪掌)", recipe: "発生: 6 | 持続: 6-8 | 硬直: 14 | ヒット: +6 | ガード: -1" },
+                { type: "frame", id: "gouki_f_10", cat: "通常技 (しゃがみ)", title: "しゃがみ中K (踝払い)", recipe: "発生: 8 | 持続: 8-10 | 硬直: 19 | ヒット: ±0 | ガード: -6" },
+                { type: "frame", id: "gouki_f_11", cat: "通常技 (しゃがみ)", title: "しゃがみ強P (獄門掌)", recipe: "発生: 8 | 持続: 8-15 | 硬直: 19 | ヒット: +1 | ガード: -8" },
+                { type: "frame", id: "gouki_f_12", cat: "通常技 (しゃがみ)", title: "しゃがみ強K (割脚)", recipe: "発生: 9 | 持続: 9-11 | 硬直: 23 | ヒット: ダウン | ガード: -12" },
+
+                { type: "frame", id: "gouki_f_13", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "弱豪波動拳", recipe: "発生: 16 (Lv1) / 31 (Lv2) / 56 (Lv3) | 硬直: 全体46〜82 | ガード: -4 (Lv1), +2 (Lv2), +21 (Lv3)" },
+                { type: "frame", id: "gouki_f_14", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "中豪波動拳", recipe: "発生: 14 (Lv1) / 31 (Lv2) / 56 (Lv3) | 硬直: 全体46〜82 | ガード: -6 (Lv1), +2 (Lv2), +21 (Lv3)" },
+                { type: "frame", id: "gouki_f_15", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "強豪波動拳", recipe: "発生: 12 (Lv1) / 31 (Lv2) / 56 (Lv3) | 硬直: 全体46〜82 | ガード: -8 (Lv1), +2 (Lv2), +21 (Lv3)" },
+                { type: "frame", id: "gouki_f_16", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "OD豪波動拳", recipe: "発生: 12 | 硬直: 全体41 | ガード: +2" },
+                { type: "frame", id: "gouki_f_17", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "弱・中・強 豪昇龍拳", recipe: "発生: 5〜7 | 硬直: 21〜35 + 着地硬直12〜15 | ガード: -23〜-36" },
+                { type: "frame", id: "gouki_f_18", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "OD豪昇龍拳", recipe: "発生: 6 | 持続: 6-16 | 硬直: 37 + 着地硬直15 | ガード: -39" },
+                { type: "frame", id: "gouki_f_19", cat: "必殺技 (波動拳・昇竜・竜巻)", title: "弱・中・強 竜巻斬空脚", recipe: "発生: 7〜12 | 硬直: 21〜30 + 着地硬直 | ガード: -13〜-59" },
+
+                { type: "frame", id: "gouki_f_20", cat: "スーパーアーツ", title: "SA1 滅殺豪波動", recipe: "発生: 10 | 全体硬直: 106 | ガード: -41" },
+                { type: "frame", id: "gouki_f_21", cat: "スーパーアーツ", title: "SA1 天魔豪斬空", recipe: "発生: 14 | 着地後33" },
+                { type: "frame", id: "gouki_f_22", cat: "スーパーアーツ", title: "SA2 崩天劫火", recipe: "発生: 9 | 持続: 9-11 | 硬直: 52 | ガード: -35" },
+                { type: "frame", id: "gouki_f_23", cat: "スーパーアーツ", title: "SA3 禍坏", recipe: "発生: 8 | 持続: 8-11 | 硬直: 58 | ガード: -41" },
+
+                { type: "frame", id: "gouki_f_24", cat: "共通システム", title: "前方 / 後方ステップ", recipe: "前方: 全体19 | 後方: 全体23" },
+                { type: "frame", id: "gouki_f_25", cat: "共通システム", title: "ドライブインパクト (鬼殺し)", recipe: "発生: 26 | 持続: 26-27 | 硬直: 35 | ガード: -3" },
+                { type: "frame", id: "gouki_f_26", cat: "共通システム", title: "ドライブパリィ / ジャストパリィ", recipe: "発生: 1 | 持続: 1-12 | 全体硬直: 33" }
+            ],
+            "ルーク": [], "リュウ": [], "ケン": []
+        };
+
+        const defaultGlobalTasks = [
+            { id: "gt_init_1", cat: "最優先で習得・練習すべきこと", title: "起き攻めの徹底", detail: "打撃の重ね（フレーム消費）を体に染み込ませ、起き上がり側がボタンを押せない状態を作る。\n\n重ねからの「打撃」「投げ」「シミー（後ろ下がりでグラップ狩り）」の選択肢を練習する。" },
+            { id: "gt_init_2", cat: "最優先で習得・練習すべきこと", title: "対空・間合い管理", detail: "対空・間合い管理\n\n昇竜拳対空を出す練習をする。\n\n昇竜拳が間に合う波動拳の間合い（距離感）を覚える。" },
+            { id: "gt_init_3", cat: "最優先で習得・練習すべきこと", title: "前歩きへの対処", detail: "相手の前歩きへの対処\n\n相手が前に歩いてきたタイミングに合わせて技を当てる。" },
+            { id: "gt_init_4", cat: "覚えておくべきフレームの知識（実戦向け）", title: "ガードされたら基本「不利」", detail: "ガードされたら基本「不利」\n\n無理に暴れず防衛姿勢を取る（知らないで暴れると危険）。\n\n有利フレームをとれる行動（攻めの起点）。" },
+            { id: "gt_init_5", cat: "覚えておくべきフレームの知識（実戦向け）", title: "ラッシュ攻撃", detail: "ラッシュ打撃：ガードされても+4F追加されるため、ガード後は「ジャンケン（読み合い）」が発生する（受ける側は基本暴れない）。" }
+        ];
+
+        let currentCharacter = "共通アクション";
+        let activeSection = "info";
+        let currentStatusFilter = "all";
+        let isDoneCollapsed = false;
+        let openedCategories = new Set();
+        let openedTaskCategories = new Set();
+
+        function getCategoryStateKey(catName) {
+            return `${currentCharacter}::${activeSection}::${catName}`;
+        }
+
+        function loadGlobalManager() {
+            const freeGoal = localStorage.getItem('sf6_global_free_goal') || '目指せハイマス！！';
+            document.getElementById('globalFreeGoalInput').value = freeGoal;
+            renderGlobalTasks();
+        }
+
+        function saveGlobalFreeGoal() {
+            const val = document.getElementById('globalFreeGoalInput').value;
+            localStorage.setItem('sf6_global_free_goal', val);
+        }
+
+        function getGlobalTasks() {
+            const saved = localStorage.getItem('sf6_global_tasks');
+            if (!saved) {
+                localStorage.setItem('sf6_global_tasks', JSON.stringify(defaultGlobalTasks));
+                return defaultGlobalTasks;
+            }
+            try {
+                const parsed = JSON.parse(saved);
+                if (!Array.isArray(parsed) || parsed.length === 0) {
+                    localStorage.setItem('sf6_global_tasks', JSON.stringify(defaultGlobalTasks));
+                    return defaultGlobalTasks;
+                }
+                return parsed;
+            } catch(e) {
+                return defaultGlobalTasks;
+            }
+        }
+
+        function saveGlobalTasks(tasks) {
+            localStorage.setItem('sf6_global_tasks', JSON.stringify(tasks));
+        }
+
+        function getGlobalTaskCheckedCount(taskId) {
+            let count = 0;
+            for (let i = 1; i <= 10; i++) {
+                if (localStorage.getItem(`gt_${taskId}_step_${i}`) === 'true') {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function toggleGlobalTaskStep(taskId, stepNum, checked) {
+            localStorage.setItem(`gt_${taskId}_step_${stepNum}`, checked);
+            renderGlobalTasks();
+        }
+
+        function resetSingleGlobalTask(taskId) {
+            for (let i = 1; i <= 10; i++) {
+                localStorage.removeItem(`gt_${taskId}_step_${i}`);
+            }
+            renderGlobalTasks();
+        }
+
+        function renderGlobalTasks() {
+            const container = document.getElementById('globalTasksContainer');
+            container.innerHTML = '';
+            const tasks = getGlobalTasks();
+
+            const grouped = {};
+            tasks.forEach(t => {
+                const cat = t.cat || "最優先で習得・練習すべきこと";
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(t);
+            });
+
+            Object.keys(grouped).forEach(cat => {
+                const card = document.createElement('div');
+                card.className = openedTaskCategories.has(cat) ? 'task-category-card open' : 'task-category-card';
+
+                const header = document.createElement('div');
+                header.className = 'task-category-header';
+                header.innerHTML = `<span>📁 ${cat} (${grouped[cat].length}件)</span>`;
+                header.onclick = () => {
+                    card.classList.toggle('open');
+                    if (card.classList.contains('open')) {
+                        openedTaskCategories.add(cat);
+                    } else {
+                        openedTaskCategories.delete(cat);
+                    }
+                };
+
+                const body = document.createElement('div');
+                body.className = 'task-category-body';
+
+                grouped[cat].forEach(t => {
+                    const checkedCount = getGlobalTaskCheckedCount(t.id);
+                    let checkboxesHtml = `<div class="task-checks-container"><span class="task-checks-label">${checkedCount}/10</span>`;
+                    for (let i = 1; i <= 10; i++) {
+                        const isChecked = localStorage.getItem(`gt_${t.id}_step_${i}`) === 'true';
+                        checkboxesHtml += `<input type="checkbox" class="task-step-checkbox" onchange="toggleGlobalTaskStep('${t.id}', ${i}, this.checked)" ${isChecked ? 'checked' : ''}>`;
+                    }
+                    checkboxesHtml += `</div>`;
+
+                    const item = document.createElement('div');
+                    item.className = 'task-item';
+                    item.innerHTML = `
+                        <div class="task-item-header">
+                            <span class="task-item-title">${t.title}</span>
+                            <div style="display:flex; gap:6px; align-items:center;">
+                                <button class="action-icon-btn reset-card" onclick="resetSingleGlobalTask('${t.id}')" title="達成度をリセット">🔄</button>
+                                <button class="task-delete-btn" onclick="deleteGlobalTask('${t.id}')">削除</button>
+                            </div>
+                        </div>
+                        ${checkboxesHtml}
+                        <div class="task-item-content" style="margin-top:8px;">${t.detail}</div>
+                    `;
+                    body.appendChild(item);
+                });
+
+                card.appendChild(header);
+                card.appendChild(body);
+                container.appendChild(card);
+            });
+        }
+
+        function addGlobalTask() {
+            const cat = document.getElementById('newTaskCat').value.trim() || "最優先で習得・練習すべきこと";
+            const title = document.getElementById('newTaskTitle').value.trim();
+            const detail = document.getElementById('newTaskDetail').value.trim();
+
+            if (!title) {
+                alert("課題タイトルを入力してください");
+                return;
+            }
+
+            const tasks = getGlobalTasks();
+            tasks.push({
+                id: `gt_${Date.now()}`,
+                cat: cat,
+                title: title,
+                detail: detail
+            });
+
+            openedTaskCategories.add(cat);
+            saveGlobalTasks(tasks);
+            document.getElementById('newTaskCat').value = '';
+            document.getElementById('newTaskTitle').value = '';
+            document.getElementById('newTaskDetail').value = '';
+            renderGlobalTasks();
+        }
+
+        function deleteGlobalTask(id) {
+            if (!confirm("この課題を削除しますか？")) return;
+            for (let i = 1; i <= 10; i++) {
+                localStorage.removeItem(`gt_${id}_step_${i}`);
+            }
+            let tasks = getGlobalTasks();
+            tasks = tasks.filter(t => t.id !== id);
+            saveGlobalTasks(tasks);
+            renderGlobalTasks();
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                const searchBox = document.getElementById('searchInput');
+                if (searchBox) {
+                    searchBox.focus();
+                    searchBox.select();
+                }
+            } else if (e.key === 'Escape' && document.activeElement.id === 'searchInput') {
+                document.activeElement.blur();
+            }
+        });
+
+        function applyTheme(charName) {
+            const theme = categoryThemes[charName] || categoryThemes["default"];
+            document.documentElement.style.setProperty('--accent-color', theme.accent);
+            document.documentElement.style.setProperty('--cat-header-bg', theme.headerBg);
+            document.documentElement.style.setProperty('--cat-sub-bg', theme.subBg);
+        }
+
+        function getRenamedCharsMap() {
+            return JSON.parse(localStorage.getItem('sf6_renamed_chars') || '{}');
+        }
+
+        function getCharacterList() {
+            const savedChars = JSON.parse(localStorage.getItem('sf6_characters') || '[]');
+            const renamedMap = getRenamedCharsMap();
+            const hiddenChars = JSON.parse(localStorage.getItem('sf6_hidden_chars') || '[]');
+
+            const baseChars = Object.keys(defaultData)
+                .filter(c => !fixedTopCategories.includes(c) && !hiddenChars.includes(c))
+                .map(c => renamedMap[c] || c);
+
+            const customOrder = JSON.parse(localStorage.getItem('sf6_char_order') || '[]');
+            
+            const allCharsSet = new Set([...baseChars, ...savedChars].filter(c => !hiddenChars.includes(c)));
+            let orderedCustom = customOrder.filter(c => allCharsSet.has(c));
+            allCharsSet.forEach(c => {
+                if (!orderedCustom.includes(c)) orderedCustom.push(c);
+            });
+
+            return [...fixedTopCategories, ...orderedCustom];
+        }
+
+        function saveCharacterOrder(chars) {
+            const orderToSave = chars.filter(c => !fixedTopCategories.includes(c));
+            localStorage.setItem('sf6_char_order', JSON.stringify(orderToSave));
+        }
+
+        function moveCurrentCharacter(direction) {
+            const chars = getCharacterList();
+            const index = chars.indexOf(currentCharacter);
+            if (index === -1) return;
+
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= chars.length) return;
+
+            const targetChar = chars[targetIndex];
+            const isCurrentFixed = fixedTopCategories.includes(currentCharacter);
+            const isTargetFixed = fixedTopCategories.includes(targetChar);
+
+            if (isCurrentFixed !== isTargetFixed) return;
+            if (isCurrentFixed && isTargetFixed) {
+                const temp = fixedTopCategories[index];
+                fixedTopCategories[index] = fixedTopCategories[targetIndex];
+                fixedTopCategories[targetIndex] = temp;
+                initCharSelector();
+                return;
+            }
+
+            const nonFixedChars = chars.filter(c => !fixedTopCategories.includes(c));
+            const curNonFixedIdx = nonFixedChars.indexOf(currentCharacter);
+            const targetNonFixedIdx = curNonFixedIdx + direction;
+
+            if (targetNonFixedIdx < 0 || targetNonFixedIdx >= nonFixedChars.length) return;
+
+            const temp = nonFixedChars[curNonFixedIdx];
+            nonFixedChars[curNonFixedIdx] = nonFixedChars[targetNonFixedIdx];
+            nonFixedChars[targetNonFixedIdx] = temp;
+
+            saveCharacterOrder(nonFixedChars);
+            initCharSelector();
+        }
+
+        function promptRenameCharacter() {
+            if (fixedTopCategories.includes(currentCharacter)) {
+                alert("固定カテゴリーの名前は変更できません。");
+                return;
+            }
+
+            const oldName = currentCharacter;
+            const inputName = prompt(`「${oldName}」の新しい名前を入力してください:`, oldName);
+            if (!inputName || !inputName.trim()) return;
+            const newName = inputName.trim();
+
+            if (newName === oldName) return;
+
+            const existingChars = getCharacterList();
+            if (existingChars.includes(newName)) {
+                alert("すでに同じ名前のキャラクターが存在します。別の名前を入力してください。");
+                return;
+            }
+
+            const oldCustom = localStorage.getItem(`custom_${oldName}`);
+            if (oldCustom !== null) {
+                localStorage.setItem(`custom_${newName}`, oldCustom);
+                localStorage.removeItem(`custom_${oldName}`);
+            }
+
+            const oldOrder = localStorage.getItem(`order_${oldName}`);
+            if (oldOrder !== null) {
+                localStorage.setItem(`order_${newName}`, oldOrder);
+                localStorage.removeItem(`order_${oldName}`);
+            }
+
+            const renamedMap = getRenamedCharsMap();
+            let foundOriginalKey = null;
+            for (const [origKey, mappedVal] of Object.entries(renamedMap)) {
+                if (mappedVal === oldName) {
+                    foundOriginalKey = origKey;
+                    break;
+                }
+            }
+
+            if (foundOriginalKey) {
+                renamedMap[foundOriginalKey] = newName;
+                localStorage.setItem('sf6_renamed_chars', JSON.stringify(renamedMap));
+            } else if (defaultData[oldName] && !fixedTopCategories.includes(oldName)) {
+                renamedMap[oldName] = newName;
+                localStorage.setItem('sf6_renamed_chars', JSON.stringify(renamedMap));
+            }
+
+            let savedChars = JSON.parse(localStorage.getItem('sf6_characters') || '[]');
+            const savedIdx = savedChars.indexOf(oldName);
+            if (savedIdx !== -1) {
+                savedChars[savedIdx] = newName;
+                localStorage.setItem('sf6_characters', JSON.stringify(savedChars));
+            }
+
+            let charOrder = JSON.parse(localStorage.getItem('sf6_char_order') || '[]');
+            const orderIdx = charOrder.indexOf(oldName);
+            if (orderIdx !== -1) {
+                charOrder[orderIdx] = newName;
+                localStorage.setItem('sf6_char_order', JSON.stringify(charOrder));
+            }
+
+            const nextOpened = new Set();
+            openedCategories.forEach(key => {
+                if (key.startsWith(`${oldName}::`)) {
+                    nextOpened.add(key.replace(`${oldName}::`, `${newName}::`));
+                } else {
+                    nextOpened.add(key);
+                }
+            });
+            openedCategories = nextOpened;
+
+            currentCharacter = newName;
+            initCharSelector();
+            applyFilters();
+        }
+
+        function deleteCurrentCharacter() {
+            if (fixedTopCategories.includes(currentCharacter)) {
+                alert("固定カテゴリーは削除できません。");
+                return;
+            }
+
+            const target = currentCharacter;
+            if (!confirm(`「${target}」をキャラクター欄から削除しますか？\n（このキャラに紐づくカスタムメモや並び順データも削除されます）`)) return;
+
+            const charItems = getItemsForCurrentChar();
+            charItems.forEach(item => {
+                for (let i = 1; i <= 10; i++) {
+                    localStorage.removeItem(`combo_${item.id}_step_${i}`);
+                }
+            });
+
+            let hiddenDefaults = JSON.parse(localStorage.getItem('sf6_hidden_defaults') || '[]');
+            const itemIds = new Set(charItems.map(i => i.id));
+            hiddenDefaults = hiddenDefaults.filter(id => !itemIds.has(id));
+            localStorage.setItem('sf6_hidden_defaults', JSON.stringify(hiddenDefaults));
+
+            localStorage.removeItem(`custom_${target}`);
+            localStorage.removeItem(`order_${target}`);
+
+            let savedChars = JSON.parse(localStorage.getItem('sf6_characters') || '[]');
+            savedChars = savedChars.filter(c => c !== target);
+            localStorage.setItem('sf6_characters', JSON.stringify(savedChars));
+
+            let charOrder = JSON.parse(localStorage.getItem('sf6_char_order') || '[]');
+            charOrder = charOrder.filter(c => c !== target);
+            localStorage.setItem('sf6_char_order', JSON.stringify(charOrder));
+
+            const origKey = getOriginalCharKey(target);
+            if (defaultData[origKey] && !fixedTopCategories.includes(origKey)) {
+                let hiddenChars = JSON.parse(localStorage.getItem('sf6_hidden_chars') || '[]');
+                if (!hiddenChars.includes(origKey)) {
+                    hiddenChars.push(origKey);
+                    localStorage.setItem('sf6_hidden_chars', JSON.stringify(hiddenChars));
+                }
+            }
+
+            const renamedMap = getRenamedCharsMap();
+            for (const [k, v] of Object.entries(renamedMap)) {
+                if (v === target) delete renamedMap[k];
+            }
+            localStorage.setItem('sf6_renamed_chars', JSON.stringify(renamedMap));
+
+            currentCharacter = "共通アクション";
+            activeSection = "info";
+            initCharSelector();
+            applyFilters();
+        }
+
+        function initCharSelector() {
+            applyTheme(currentCharacter);
+
+            const select = document.getElementById('charSelect');
+            select.innerHTML = '';
+            const chars = getCharacterList();
+
+            if (!chars.includes(currentCharacter)) {
+                currentCharacter = "共通アクション";
+            }
+
+            chars.forEach(char => {
+                const opt = document.createElement('option');
+                opt.value = char;
+                opt.innerText = fixedTopCategories.includes(char) ? `📌 ${char}` : char;
+                if (char === currentCharacter) opt.selected = true;
+                select.appendChild(opt);
+            });
+
+            const switchContainer = document.getElementById('sectionSwitchContainer');
+            const renameBtn = document.getElementById('btnRenameChar');
+            const deleteBtn = document.getElementById('btnDeleteChar');
+            const isFixedCategory = fixedTopCategories.includes(currentCharacter);
+
+            if (renameBtn) {
+                renameBtn.style.display = isFixedCategory ? 'none' : 'inline-block';
+            }
+            if (deleteBtn) {
+                deleteBtn.style.display = isFixedCategory ? 'none' : 'inline-block';
+            }
+
+            if (isFixedCategory) {
+                switchContainer.style.display = 'none';
+                activeSection = 'info';
+                document.getElementById('formTitle').innerText = `＋ 【${currentCharacter}】に新しいメモを追加`;
+                document.getElementById('newType').value = 'info';
+                document.getElementById('newType').style.display = 'none';
+            } else {
+                switchContainer.style.display = 'flex';
+                document.getElementById('newType').style.display = 'block';
+                document.getElementById('formTitle').innerText = `＋ 【${currentCharacter}】に新しいメモを追加`;
+            }
+
+            updateCategoryOptions();
+            applyFilters();
+        }
+
+        function onCharSelectChange(val) {
+            currentCharacter = val;
+            applyTheme(currentCharacter);
+            const isFixedCategory = fixedTopCategories.includes(currentCharacter);
+            if (isFixedCategory) {
+                activeSection = 'info';
+            } else {
+                activeSection = 'combo';
+                document.getElementById('btnSwitchCombo').classList.add('active');
+                document.getElementById('btnSwitchInfo').classList.remove('active');
+                document.getElementById('btnSwitchMatchup').classList.remove('active');
+                document.getElementById('btnSwitchFrame').classList.remove('active');
+            }
+            initCharSelector();
+            document.getElementById('searchInput').value = '';
+        }
+
+        function promptAddCharacter() {
+            const newChar = prompt("追加したいキャラクター名またはカテゴリー名を入力してください:");
+            if (!newChar || !newChar.trim()) return;
+            const charName = newChar.trim();
+
+            const chars = getCharacterList();
+            if (chars.includes(charName)) {
+                alert("すでに存在する項目です。");
+                return;
+            }
+
+            let hiddenChars = JSON.parse(localStorage.getItem('sf6_hidden_chars') || '[]');
+            if (hiddenChars.includes(charName)) {
+                hiddenChars = hiddenChars.filter(c => c !== charName);
+                localStorage.setItem('sf6_hidden_chars', JSON.stringify(hiddenChars));
+            }
+
+            const savedChars = JSON.parse(localStorage.getItem('sf6_characters') || '[]');
+            savedChars.push(charName);
+            localStorage.setItem('sf6_characters', JSON.stringify(savedChars));
+
+            const order = JSON.parse(localStorage.getItem('sf6_char_order') || '[]');
+            order.push(charName);
+            saveCharacterOrder(order);
+
+            currentCharacter = charName;
+            activeSection = 'combo';
+            initCharSelector();
+            applyFilters();
+        }
+
+        function setActiveSection(section) {
+            activeSection = section;
+            document.getElementById('btnSwitchCombo').classList.toggle('active', section === 'combo');
+            document.getElementById('btnSwitchInfo').classList.toggle('active', section === 'info');
+            document.getElementById('btnSwitchMatchup').classList.toggle('active', section === 'matchup');
+            document.getElementById('btnSwitchFrame').classList.toggle('active', section === 'frame');
+            document.getElementById('filterContainerBox').style.display = (section === 'combo') ? 'block' : 'none';
+
+            if (!fixedTopCategories.includes(currentCharacter)) {
+                document.getElementById('newType').value = section;
+            }
+
+            updateCategoryOptions();
+            applyFilters();
+        }
+
+        function updateCategoryOptions() {
+            const datalist = document.getElementById('catListOptions');
+            datalist.innerHTML = '';
+
+            const isFixedCategory = fixedTopCategories.includes(currentCharacter);
+            const type = isFixedCategory ? 'info' : document.getElementById('newType').value;
+            const items = getItemsForCurrentChar();
+            
+            const filteredItems = items.filter(i => i.type === type);
+            const existingCats = [...new Set(filteredItems.map(i => i.cat || "その他メモ"))];
+
+            if (existingCats.length === 0) {
+                if (type === 'combo') {
+                    existingCats.push("小技", "中技", "強技", "OD灼火", "中足ラッシュ", "生ラッシュコンボ", "パニカンコンボ", "インパクトコンボ", "対空・空中コンボ", "固め連携", "起き攻め・セットプレイ", "高難易度・スタンコンボ");
+                } else if (type === 'frame') {
+                    existingCats.push("通常技 (立ち)", "通常技 (しゃがみ)", "必殺技 (波動拳・昇竜・竜巻)", "スーパーアーツ", "共通システム");
+                } else if (type === 'matchup') {
+                    existingCats.push("キャラ対策メモ", "確定反撃・割り込み", "要注意連携・セットプレイ");
+                } else {
+                    existingCats.push("立ち回り・基本コンセプト", "守り・切り返し");
+                }
+            }
+
+            existingCats.forEach(c => datalist.innerHTML += `<option value="${c}">`);
+        }
+
+        function setStatusFilter(status, btnEl) {
+            currentStatusFilter = status;
+            const btns = document.querySelectorAll('#statusFilterButtons .filter-btn:not(.toggle-btn):not(.reset-all-btn)');
+            btns.forEach(b => b.classList.remove('active'));
+            if (btnEl) btnEl.classList.add('active');
+            applyFilters();
+        }
+
+        function toggleCollapseDone() {
+            isDoneCollapsed = !isDoneCollapsed;
+            const btn = document.getElementById('btnCollapseDone');
+            if (btn) {
+                btn.classList.toggle('active', isDoneCollapsed);
+                btn.innerText = isDoneCollapsed ? '👁️ 完了済みを展開' : '🙈 完了済みを折りたたむ';
+            }
+            applyFilters();
+        }
+
+        function getOriginalCharKey(displayCharName) {
+            if (defaultData[displayCharName]) return displayCharName;
+            const renamedMap = getRenamedCharsMap();
+            for (const [origKey, mappedVal] of Object.entries(renamedMap)) {
+                if (mappedVal === displayCharName) return origKey;
+            }
+            return displayCharName;
+        }
+
+        function getItemsForCurrentChar() {
+            const savedCustom = JSON.parse(localStorage.getItem(`custom_${currentCharacter}`) || '[]');
+            const origKey = getOriginalCharKey(currentCharacter);
+            const baseData = defaultData[origKey] || [];
+            const hiddenDefaults = JSON.parse(localStorage.getItem('sf6_hidden_defaults') || '[]');
+            const filteredBase = baseData.filter(i => !hiddenDefaults.includes(i.id));
+            
+            let allItems = [...filteredBase, ...savedCustom];
+
+            const itemOrder = JSON.parse(localStorage.getItem(`order_${currentCharacter}`) || '[]');
+            if (itemOrder.length > 0) {
+                allItems.sort((a, b) => {
+                    const idxA = itemOrder.indexOf(a.id);
+                    const idxB = itemOrder.indexOf(b.id);
+                    if (idxA === -1 && idxB === -1) return 0;
+                    if (idxA === -1) return 1;
+                    if (idxB === -1) return -1;
+                    return idxA - idxB;
+                });
+            }
+            return allItems;
+        }
+
+        function saveItemOrder(items) {
+            const ids = items.map(i => i.id);
+            localStorage.setItem(`order_${currentCharacter}`, JSON.stringify(ids));
+        }
+
+        function moveItemCard(id, direction) {
+            const allItems = getItemsForCurrentChar();
+            const index = allItems.findIndex(i => i.id === id);
+            if (index === -1) return;
+
+            const targetIndex = index + direction;
+            if (targetIndex < 0 || targetIndex >= allItems.length) return;
+
+            const temp = allItems[index];
+            allItems[index] = allItems[targetIndex];
+            allItems[targetIndex] = temp;
+
+            saveItemOrder(allItems);
+            applyFilters();
+        }
+
+        function moveCategoryOrder(catName, direction) {
+            const allItems = getItemsForCurrentChar();
+            const sectionItems = allItems.filter(item => {
+                if (activeSection === 'combo') return item.type === 'combo';
+                if (activeSection === 'info') return item.type === 'info';
+                if (activeSection === 'matchup') return item.type === 'matchup';
+                if (activeSection === 'frame') return item.type === 'frame';
+                return true;
+            });
+
+            const cats = [...new Set(sectionItems.map(i => i.cat || "その他メモ"))];
+            const catIndex = cats.indexOf(catName);
+            if (catIndex === -1) return;
+
+            const targetCatIndex = catIndex + direction;
+            if (targetCatIndex < 0 || targetCatIndex >= cats.length) return;
+
+            const tempCat = cats[catIndex];
+            cats[catIndex] = cats[targetCatIndex];
+            cats[targetCatIndex] = tempCat;
+
+            const reorderedItems = [];
+            cats.forEach(c => {
+                const groupItems = allItems.filter(i => (i.cat || "その他メモ") === c && sectionItems.includes(i));
+                reorderedItems.push(...groupItems);
+            });
+
+            allItems.forEach(i => {
+                if (!reorderedItems.includes(i)) {
+                    reorderedItems.push(i);
+                }
+            });
+
+            saveItemOrder(reorderedItems);
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const allItems = getItemsForCurrentChar();
+
+            const sectionItems = allItems.filter(item => {
+                if (activeSection === 'combo') return item.type === 'combo';
+                if (activeSection === 'info') return item.type === 'info';
+                if (activeSection === 'matchup') return item.type === 'matchup';
+                if (activeSection === 'frame') return item.type === 'frame';
+                return true;
+            });
+
+            const isFixedCategory = fixedTopCategories.includes(currentCharacter);
+            document.getElementById('filterContainerBox').style.display = (isFixedCategory || activeSection !== 'combo') ? 'none' : 'block';
+
+            const progressBanner = document.getElementById('overallProgressContainer');
+            if (!isFixedCategory && activeSection === 'combo') {
+                progressBanner.style.display = 'flex';
+                updateOverallProgress(allItems.filter(i => i.type === 'combo'));
+            } else {
+                progressBanner.style.display = 'none';
+            }
+
+            const filtered = sectionItems.filter(item => {
+                if (activeSection === 'combo') {
+                    const count = getCheckedCount(item.id);
+                    if (currentStatusFilter === 'todo' && count >= 1) return false;
+                    if (currentStatusFilter === 'done' && count < 1) return false;
+                    if (isDoneCollapsed && count >= 1) return false;
+                }
+
+                if (query) {
+                    const itemCat = item.cat || "その他メモ";
+                    const textToSearch = (item.recipe + ' ' + (item.okizeme || '') + ' ' + (item.title || '') + ' ' + itemCat).toLowerCase();
+                    if (!textToSearch.includes(query)) return false;
+                }
+
+                return true;
+            });
+
+            renderActiveList(filtered);
+        }
+
+        function getCheckedCount(id) {
+            let count = 0;
+            for (let i = 1; i <= 10; i++) {
+                if (localStorage.getItem(`combo_${id}_step_${i}`) === 'true') {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function resetSingleCombo(id) {
+            for (let i = 1; i <= 10; i++) {
+                localStorage.removeItem(`combo_${id}_step_${i}`);
+            }
+            applyFilters();
+        }
+
+        function resetCategoryCombos(catName) {
+            if (!confirm(`カテゴリー「${catName}」のすべてのコンボ進捗をリセットしますか？`)) return;
+            const items = getItemsForCurrentChar().filter(i => i.type === 'combo' && (i.cat || "その他メモ") === catName);
+            items.forEach(item => {
+                for (let i = 1; i <= 10; i++) {
+                    localStorage.removeItem(`combo_${item.id}_step_${i}`);
+                }
+            });
+            applyFilters();
+        }
+
+        function resetAllCombosForCurrentChar() {
+            if (!confirm(`【${currentCharacter}】の全コンボ達成度チェックをリセットして0にしますか？`)) return;
+            const items = getItemsForCurrentChar().filter(i => i.type === 'combo');
+            items.forEach(item => {
+                for (let i = 1; i <= 10; i++) {
+                    localStorage.removeItem(`combo_${item.id}_step_${i}`);
+                }
+            });
+            applyFilters();
+        }
+
+        function updateOverallProgress(comboItems) {
+            const totalCombos = comboItems.length;
+            if (totalCombos === 0) {
+                document.getElementById('overallProgressText').innerText = `0 / 0 完了 (0%)`;
+                return;
+            }
+
+            let completedCombos = 0;
+            comboItems.forEach(item => {
+                if (getCheckedCount(item.id) >= 1) {
+                    completedCombos++;
+                }
+            });
+
+            const percent = Math.floor((completedCombos / totalCombos) * 100);
+            document.getElementById('overallProgressText').innerText = `${completedCombos} / ${totalCombos}コンボ完了 (${percent}%)`;
+        }
+
+        function renderActiveList(data) {
+            const container = document.getElementById('mainContentContainer');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `<div class="empty-msg">条件に一致する項目が見つかりません。</div>`;
+                return;
+            }
+
+            const grouped = {};
+            data.forEach(item => {
+                const cat = item.cat || "その他メモ";
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push(item);
+            });
+
+            const catKeys = Object.keys(grouped);
+            catKeys.forEach((catName, index) => {
+                const stateKey = getCategoryStateKey(catName);
+                const isOpen = openedCategories.has(stateKey);
+
+                const groupDiv = document.createElement('div');
+                groupDiv.className = isOpen ? 'category-group' : 'category-group collapsed';
+
+                const catHeader = document.createElement('div');
+                catHeader.className = 'category-header';
+                
+                const titleArea = document.createElement('div');
+                titleArea.className = 'category-title-area';
+                titleArea.innerHTML = `<span>${catName}</span><span class="category-count">${grouped[catName].length}件</span>`;
+                titleArea.onclick = () => {
+                    const willOpen = groupDiv.classList.contains('collapsed');
+                    groupDiv.classList.toggle('collapsed');
+                    if (willOpen) {
+                        openedCategories.add(stateKey);
+                    } else {
+                        openedCategories.delete(stateKey);
+                    }
+                };
+
+                const actionsArea = document.createElement('div');
+                actionsArea.className = 'category-actions';
+
+                if (activeSection === 'combo') {
+                    const resetCatBtn = document.createElement('button');
+                    resetCatBtn.className = 'cat-action-btn reset-btn';
+                    resetCatBtn.innerHTML = '🔄 リセット';
+                    resetCatBtn.title = 'このカテゴリーのコンボ達成度をリセット';
+                    resetCatBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        resetCategoryCombos(catName);
+                    };
+                    actionsArea.appendChild(resetCatBtn);
+                }
+
+                if (index > 0) {
+                    const moveLeftBtn = document.createElement('button');
+                    moveLeftBtn.className = 'cat-action-btn';
+                    moveLeftBtn.innerHTML = '◀';
+                    moveLeftBtn.title = 'カテゴリーを上に移動';
+                    moveLeftBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        moveCategoryOrder(catName, -1);
+                    };
+                    actionsArea.appendChild(moveLeftBtn);
+                }
+
+                if (index < catKeys.length - 1) {
+                    const moveRightBtn = document.createElement('button');
+                    moveRightBtn.className = 'cat-action-btn';
+                    moveRightBtn.innerHTML = '▶';
+                    moveRightBtn.title = 'カテゴリーを下に移動';
+                    moveRightBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        moveCategoryOrder(catName, 1);
+                    };
+                    actionsArea.appendChild(moveRightBtn);
+                }
+                
+                const editCatBtn = document.createElement('button');
+                editCatBtn.className = 'cat-action-btn';
+                editCatBtn.innerText = '編集';
+                editCatBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    editCategoryName(catName);
+                };
+                actionsArea.appendChild(editCatBtn);
+
+                catHeader.appendChild(titleArea);
+                catHeader.appendChild(actionsArea);
+                groupDiv.appendChild(catHeader);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'category-content';
+
+                grouped[catName].forEach((item) => {
+                    if (item.type === 'info' || item.type === 'frame' || item.type === 'matchup') {
+                        const card = document.createElement('div');
+                        card.className = `card-info collapsed ${item.type === 'matchup' ? 'matchup-card' : ''}`;
+                        card.innerHTML = `
+                            <div class="info-header-row">
+                                <div class="info-title" onclick="this.closest('.card-info').classList.toggle('collapsed')">
+                                    <span>${item.title || '無題'}</span>
+                                </div>
+                                <div class="card-actions-top">
+                                    <button class="action-icon-btn" onclick="moveItemCard('${item.id}', -1)" title="左/上に移動">◀</button>
+                                    <button class="action-icon-btn" onclick="moveItemCard('${item.id}', 1)" title="右/下に移動">▶</button>
+                                    <button class="action-icon-btn" onclick="openEditModal('${item.id}')">編集</button>
+                                    <button class="action-icon-btn delete" onclick="deleteItem('${item.id}')">削除</button>
+                                </div>
+                            </div>
+                            <div class="info-body">${item.recipe}</div>
+                        `;
+                        contentDiv.appendChild(card);
+                    } else {
+                        const checkedCount = getCheckedCount(item.id);
+                        const isAllDone = checkedCount >= 1;
+
+                        const card = document.createElement('div');
+                        card.className = `card ${isAllDone ? 'done' : ''}`;
+                        card.id = `card-${item.id}`;
+
+                        const formattedRecipe = item.recipe.replace(/→/g, '<span class="arrow">→</span>');
+                        
+                        let okizemeHtml = '';
+                        if (item.okizeme && item.okizeme.trim() !== '') {
+                            const formattedOkizeme = item.okizeme.replace(/→/g, '<span class="arrow">→</span>');
+                            okizemeHtml = `<div class="combo-okizeme">起き攻め: ${formattedOkizeme}</div>`;
+                        }
+
+                        let checkboxesHtml = `<div class="checks-container"><span class="checks-label-text">${checkedCount}/10</span>`;
+                        for (let i = 1; i <= 10; i++) {
+                            const isChecked = localStorage.getItem(`combo_${item.id}_step_${i}`) === 'true';
+                            checkboxesHtml += `<input type="checkbox" class="step-checkbox" onchange="toggleStep('${item.id}', ${i}, this.checked)" ${isChecked ? 'checked' : ''}>`;
+                        }
+                        checkboxesHtml += `</div>`;
+
+                        const titleHtml = item.title ? `<div style="font-size: 0.95rem; font-weight: bold; color: var(--accent-color); margin-bottom: 6px;">${item.title}</div>` : '';
+
+                        card.innerHTML = `
+                            <div class="card-header">
+                                <span class="combo-num">${isAllDone ? '完了' : 'コンボ'}</span>
+                                ${checkboxesHtml}
+                                <div class="card-actions-top">
+                                    <button class="action-icon-btn reset-card" onclick="resetSingleCombo('${item.id}')" title="このコンボの達成度をリセット">🔄</button>
+                                    <button class="action-icon-btn" onclick="moveItemCard('${item.id}', -1)" title="左/上に移動">◀</button>
+                                    <button class="action-icon-btn" onclick="moveItemCard('${item.id}', 1)" title="右/下に移動">▶</button>
+                                    <button class="action-icon-btn" onclick="openEditModal('${item.id}')">編集</button>
+                                    <button class="action-icon-btn delete" onclick="deleteItem('${item.id}')">削除</button>
+                                </div>
+                            </div>
+                            ${titleHtml}
+                            <div class="recipe">${formattedRecipe}</div>
+                            ${okizemeHtml}
+                        `;
+                        contentDiv.appendChild(card);
+                    }
+                });
+
+                groupDiv.appendChild(contentDiv);
+                container.appendChild(groupDiv);
+            });
+        }
+
+        function editCategoryName(oldCatName) {
+            const newCatName = prompt(`「${oldCatName}」の新しいカテゴリー名を入力してください:`, oldCatName);
+            if (!newCatName || !newCatName.trim() || newCatName === oldCatName) return;
+            const targetCat = newCatName.trim();
+
+            const oldKey = getCategoryStateKey(oldCatName);
+            const newKey = getCategoryStateKey(targetCat);
+            if (openedCategories.has(oldKey)) {
+                openedCategories.delete(oldKey);
+                openedCategories.add(newKey);
+            }
+
+            const items = getItemsForCurrentChar();
+            let savedCustom = JSON.parse(localStorage.getItem(`custom_${currentCharacter}`) || '[]');
+            let hiddenDefaults = JSON.parse(localStorage.getItem('sf6_hidden_defaults') || '[]');
+
+            items.forEach(item => {
+                if ((item.cat || "その他メモ") === oldCatName) {
+                    const isCustom = savedCustom.some(c => c.id === item.id);
+                    if (isCustom) {
+                        const target = savedCustom.find(c => c.id === item.id);
+                        target.cat = targetCat;
+                    } else {
+                        let copy = { ...item, cat: targetCat };
+                        savedCustom.push(copy);
+                        hiddenDefaults.push(item.id);
+                    }
+                }
+            });
+
+            localStorage.setItem(`custom_${currentCharacter}`, JSON.stringify(savedCustom));
+            localStorage.setItem('sf6_hidden_defaults', JSON.stringify(hiddenDefaults));
+
+            updateCategoryOptions();
+            applyFilters();
+        }
+
+        function toggleStep(id, stepNum, checked) {
+            localStorage.setItem(`combo_${id}_step_${stepNum}`, checked);
+            applyFilters();
+        }
+
+        function toggleFormType() {
+            updateCategoryOptions();
+        }
+
+        function addCustomItem() {
+            const isFixedCategory = fixedTopCategories.includes(currentCharacter);
+            const type = isFixedCategory ? 'info' : document.getElementById('newType').value;
+            const catInputVal = document.getElementById('newCatInput').value.trim();
+            const cat = catInputVal !== "" ? catInputVal : "その他メモ";
+            const title = document.getElementById('newTitle').value.trim();
+            const recipe = document.getElementById('newRecipe').value.trim();
+            const okizeme = document.getElementById('newOkizeme').value.trim();
+
+            if (!recipe) {
+                alert("内容を入力してください");
+                return;
+            }
+
+            const newItem = {
+                type: type,
+                id: `item_${Date.now()}`,
+                cat: cat,
+                title: title,
+                recipe: recipe,
+                okizeme: okizeme
+            };
+
+            const savedCustom = JSON.parse(localStorage.getItem(`custom_${currentCharacter}`) || '[]');
+            savedCustom.push(newItem);
+            localStorage.setItem(`custom_${currentCharacter}`, JSON.stringify(savedCustom));
+
+            if (!isFixedCategory && activeSection !== type) {
+                setActiveSection(type);
+            }
+
+            openedCategories.add(getCategoryStateKey(cat));
+
+            document.getElementById('newRecipe').value = '';
+            document.getElementById('newTitle').value = '';
+            document.getElementById('newOkizeme').value = '';
+            document.getElementById('newCatInput').value = '';
+            
+            applyFilters();
+        }
+
+        function deleteItem(id) {
+            if (!confirm("この項目を削除してもよろしいですか？")) return;
+
+            for (let i = 1; i <= 10; i++) {
+                localStorage.removeItem(`combo_${id}_step_${i}`);
+            }
+
+            let savedCustom = JSON.parse(localStorage.getItem(`custom_${currentCharacter}`) || '[]');
+            savedCustom = savedCustom.filter(i => i.id !== id);
+            localStorage.setItem(`custom_${currentCharacter}`, JSON.stringify(savedCustom));
+
+            let hiddenDefaults = JSON.parse(localStorage.getItem('sf6_hidden_defaults') || '[]');
+            if (!hiddenDefaults.includes(id)) {
+                hiddenDefaults.push(id);
+            }
+            localStorage.setItem('sf6_hidden_defaults', JSON.stringify(hiddenDefaults));
+
+            updateCategoryOptions();
+            applyFilters();
+        }
+
+        function openEditModal(id) {
+            const items = getItemsForCurrentChar();
+            const target = items.find(i => i.id === id);
+            if (!target) return;
+
+            document.getElementById('editItemId').value = target.id;
+            document.getElementById('editTypeInput').value = target.type || "combo";
+            document.getElementById('editTitleInput').value = target.title || "";
+            document.getElementById('editRecipeInput').value = target.recipe || "";
+            document.getElementById('editOkizemeInput').value = target.okizeme || "";
+            document.getElementById('editCatInput').value = target.cat || "その他メモ";
+
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEditedItem() {
+            const id = document.getElementById('editItemId').value;
+            const newType = document.getElementById('editTypeInput').value;
+            const newTitle = document.getElementById('editTitleInput').value.trim();
+            const newRecipe = document.getElementById('editRecipeInput').value;
+            const newOkizeme = document.getElementById('editOkizemeInput').value;
+            const newCat = document.getElementById('editCatInput').value.trim() || "その他メモ";
+
+            const items = getItemsForCurrentChar();
+            const target = items.find(i => i.id === id);
+            if (!target) return;
+
+            let savedCustom = JSON.parse(localStorage.getItem(`custom_${currentCharacter}`) || '[]');
+            const customIndex = savedCustom.findIndex(i => i.id === id);
+            
+            if (customIndex !== -1) {
+                savedCustom[customIndex].type = newType;
+                savedCustom[customIndex].title = newTitle;
+                savedCustom[customIndex].recipe = newRecipe;
+                savedCustom[customIndex].okizeme = newOkizeme;
+                savedCustom[customIndex].cat = newCat;
+                localStorage.setItem(`custom_${currentCharacter}`, JSON.stringify(savedCustom));
+            } else {
+                const updatedCopy = {
+                    ...target,
+                    type: newType,
+                    title: newTitle,
+                    recipe: newRecipe,
+                    okizeme: newOkizeme,
+                    cat: newCat
+                };
+                savedCustom.push(updatedCopy);
+                localStorage.setItem(`custom_${currentCharacter}`, JSON.stringify(savedCustom));
+
+                let hiddenDefaults = JSON.parse(localStorage.getItem('sf6_hidden_defaults') || '[]');
+                if (!hiddenDefaults.includes(id)) {
+                    hiddenDefaults.push(id);
+                }
+                localStorage.setItem('sf6_hidden_defaults', JSON.stringify(hiddenDefaults));
+            }
+
+            openedCategories.add(getCategoryStateKey(newCat));
+
+            closeEditModal();
+            updateCategoryOptions();
+            applyFilters();
+        }
+
+        function generateBackupData() {
+            const backupObj = {
+                characters: localStorage.getItem('sf6_characters'),
+                renamedChars: localStorage.getItem('sf6_renamed_chars'),
+                hiddenChars: localStorage.getItem('sf6_hidden_chars'),
+                charOrder: localStorage.getItem('sf6_char_order'),
+                hiddenDefaults: localStorage.getItem('sf6_hidden_defaults'),
+                globalFreeGoal: localStorage.getItem('sf6_global_free_goal'),
+                globalTasks: localStorage.getItem('sf6_global_tasks')
+            };
+            getCharacterList().forEach(char => {
+                backupObj[`custom_${char}`] = localStorage.getItem(`custom_${char}`);
+                backupObj[`order_${char}`] = localStorage.getItem(`order_${char}`);
+            });
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith('combo_') || key.startsWith('gt_')) {
+                    backupObj[key] = localStorage.getItem(key);
+                }
+            }
+            return JSON.stringify(backupObj);
+        }
+
+        function restoreFromBackupObj(backupObj) {
+            if (backupObj.characters) localStorage.setItem('sf6_characters', backupObj.characters);
+            if (backupObj.renamedChars) localStorage.setItem('sf6_renamed_chars', backupObj.renamedChars);
+            if (backupObj.hiddenChars) localStorage.setItem('sf6_hidden_chars', backupObj.hiddenChars);
+            if (backupObj.charOrder) localStorage.setItem('sf6_char_order', backupObj.charOrder);
+            if (backupObj.hiddenDefaults) localStorage.setItem('sf6_hidden_defaults', backupObj.hiddenDefaults);
+            if (backupObj.globalFreeGoal) localStorage.setItem('sf6_global_free_goal', backupObj.globalFreeGoal);
+            if (backupObj.globalTasks) localStorage.setItem('sf6_global_tasks', backupObj.globalTasks);
+
+            Object.keys(backupObj).forEach(key => {
+                if (!['characters', 'renamedChars', 'hiddenChars', 'charOrder', 'hiddenDefaults', 'globalFreeGoal', 'globalTasks'].includes(key)) {
+                    if (backupObj[key] !== null) {
+                        localStorage.setItem(key, backupObj[key]);
+                    }
+                }
+            });
+
+            loadGlobalManager();
+            initCharSelector();
+            applyFilters();
+        }
+
+        function copyDataToClipboard() {
+            const dataStr = generateBackupData();
+            navigator.clipboard.writeText(dataStr).then(() => {
+                alert("バックアップデータをクリップボードにコピーしました！\nメモ帳やLINE等に貼り付けて保存してください。");
+            }).catch(() => {
+                alert("コピーに失敗しました。ファイル書き出しをお試しください。");
+            });
+        }
+
+        function openTextImportModal() {
+            document.getElementById('importTextInput').value = '';
+            document.getElementById('textImportModal').style.display = 'flex';
+        }
+
+        function closeTextImportModal() {
+            document.getElementById('textImportModal').style.display = 'none';
+        }
+
+        function restoreFromText() {
+            const text = document.getElementById('importTextInput').value.trim();
+            if (!text) {
+                alert("バックアップテキストを入力してください");
+                return;
+            }
+            try {
+                const backupObj = JSON.parse(text);
+                restoreFromBackupObj(backupObj);
+                alert("データを正常に復元しました！");
+                closeTextImportModal();
+            } catch (err) {
+                alert("無効なバックアップデータです。正しいテキストを貼り付けてください。");
+            }
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(generateBackupData());
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `sf6_memo_backup_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function importData(event) {
+            const fileReader = new FileReader();
+            if (event.target.files[0]) {
+                fileReader.readAsText(event.target.files[0], "UTF-8");
+                fileReader.onload = function(e) {
+                    try {
+                        const backupObj = JSON.parse(e.target.result);
+                        restoreFromBackupObj(backupObj);
+                        alert("ファイルを読み込んでデータを正常に復元しました！");
+                    } catch (err) {
+                        alert("ファイルの読み込みに失敗しました。");
+                    }
+                }
+            }
+        }
+
+        function resetToInitialScreen() {
+            currentCharacter = "共通アクション";
+            activeSection = "info";
+            currentStatusFilter = "all";
+            isDoneCollapsed = false;
+            openedCategories.clear();
+            openedTaskCategories.clear();
+
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+
+            const filterBtns = document.querySelectorAll('#statusFilterButtons .filter-btn:not(.toggle-btn):not(.reset-all-btn)');
+            filterBtns.forEach((b, idx) => b.classList.toggle('active', idx === 0));
+
+            const collapseBtn = document.getElementById('btnCollapseDone');
+            if (collapseBtn) {
+                collapseBtn.classList.remove('active');
+                collapseBtn.innerText = '🙈 完了済みを折りたたむ';
+            }
+
+            loadGlobalManager();
+            initCharSelector();
+            setActiveSection('info');
+        }
+
+        resetToInitialScreen();
+    </script>
+</body>
+</html>
